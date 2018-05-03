@@ -86,9 +86,14 @@ Describe "Password" {
             Set-PasswordstatePassword -PasswordID $Password.PasswordID -Title $PasswordTitle
         }
 
-        It "Find" {
-            $Password = Find-PasswordstatePassword -Search $Password.Title
-            $Password.Title | should -Be $PasswordTitle
+        It "Find across all password lists" {
+            $PasswordResult = Find-PasswordstatePassword -Search $Password.Title
+            $PasswordResult.Title | should -Be $PasswordTitle
+        }
+
+        It "Find from password list" {
+            $PasswordResult = Find-PasswordstatePassword -Search $Password.Title -PasswordListID $Password.PasswordListID
+            $PasswordResult.Title | should -Be $PasswordTitle
         }
     }
 }

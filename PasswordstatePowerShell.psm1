@@ -62,7 +62,7 @@ function Invoke-PasswordstateAPI {
     param (
         [ValidateSet("passwordlists","searchpasswordlists","folders","passwords","searchpasswords","generatepassword")]
         $Resource,
-        
+
         $ResourceID,
         $SubResource,
         $Method,
@@ -311,7 +311,7 @@ function Get-PasswordstatePasswordAll {
 
 function Find-PasswordstatePassword {
     param (
-        [Parameter(ValueFromPipelineByPropertyName)][int]$PasswordListID,
+        [int]$PasswordListID,
         [Parameter(ParameterSetName="GeneralSearch")]$Search,
         [Parameter(ParameterSetName="SpecificSearch")]$Title,
         [Parameter(ParameterSetName="SpecificSearch")]$ADDomainNetBIOS,
@@ -341,7 +341,8 @@ function Find-PasswordstatePassword {
         [Parameter(ParameterSetName="SpecificSearch")]$ExpiryDateRange,
         [Parameter(ParameterSetName="SpecificSearch")]$AndOr
     )
-    Invoke-PasswordstateAPI -Method get -Resource searchpasswords -ResourceID $PasswordListID -QueryStringParameters $PSBoundParameters
+    $ResourceIDParameter = if ($PasswordListID) {@{ResourceID = $PasswordListID}} else {@{}}
+    Invoke-PasswordstateAPI -Method get -Resource searchpasswords @ResourceIDParameter -QueryStringParameters $PSBoundParameters
 }
 
 function New-PasswordstateDependency {
