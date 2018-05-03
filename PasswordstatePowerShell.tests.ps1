@@ -46,11 +46,13 @@ Describe "List" {
     }
 
     It "Get all" {
-        Get-PasswordstateList -All | Should -Not -BeNullOrEmpty
+        $Results = Get-PasswordstateList -All 
+        $Results | Should -Not -BeNullOrEmpty
     }
 
     It "Find by Name" {
-        Find-PasswordstateList -PasswordList $TestPasswordListName | Should -Not -BeNullOrEmpty
+        $PasswordList = Find-PasswordstateList -PasswordList $TestPasswordListName 
+        $PasswordList.PasswordList | Should -Be $TestPasswordListName 
     }
 }
 
@@ -59,25 +61,28 @@ Describe "Password" {
     $PasswordTitle = "$PesterGeneratedPhrase password"
 
     It "Generate random" {
-        Get-PasswordstateRandomPassword | Should -Not -BeNullOrEmpty
+        $PasswordstateRandomPassword = Get-PasswordstateRandomPassword
+        $PasswordstateRandomPassword | Should -Not -BeNullOrEmpty
     }
     
     $PasswordList = Find-PasswordstateList -PasswordList $TestPasswordListName
 
-    It "New" {        
+    Context "Password New Get Set" {
         $Password = New-PasswordstatePassword -PasswordListID $PasswordList.PasswordListID -Title $PasswordTitle -UserName "username" -Password "password"
-        $Password | Should -Not -BeNullOrEmpty
-    }
-
-    It "Get" {
-        $PasswordRetrieved = Get-PasswordstatePassword -ID $Password.PasswordID
-        $PasswordRetrieved | Should -Not -BeNullOrEmpty
-    }
+        It "New" {        
+            $Password | Should -Not -BeNullOrEmpty
+        }
     
-    It "Set" {
-        $Password.Title | should -Be $PasswordTitle
-        $NewPasswordTitle = $PasswordTitle + "2"
-        $PasswordUpdated = Set-PasswordstatePassword -PasswordID $Password.PasswordID -Title $NewPasswordTitle
-        $PasswordUpdated.Title | should -Be $NewPasswordTitle
+        It "Get" {
+            $PasswordRetrieved = Get-PasswordstatePassword -ID $Password.PasswordID
+            $PasswordRetrieved | Should -Not -BeNullOrEmpty
+        }
+        
+        It "Set" {
+            $Password.Title | should -Be $PasswordTitle
+            $NewPasswordTitle = $PasswordTitle + "2"
+            $PasswordUpdated = Set-PasswordstatePassword -PasswordID $Password.PasswordID -Title $NewPasswordTitle
+            $PasswordUpdated.Title | should -Be $NewPasswordTitle
+        }    
     }
 }
