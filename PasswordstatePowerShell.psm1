@@ -60,7 +60,9 @@ function Get-PasswordstateAPIURL {
 function Invoke-PasswordstateAPI {
     [CmdletBinding()]
     param (
-        [ValidateSet("passwordlists","searchpasswordlists","folders","passwords","generatepassword")]$Resource,
+        [ValidateSet("passwordlists","searchpasswordlists","folders","passwords","searchpasswords","generatepassword")]
+        $Resource,
+        
         $ResourceID,
         $SubResource,
         $Method,

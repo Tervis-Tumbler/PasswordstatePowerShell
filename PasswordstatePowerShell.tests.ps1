@@ -83,6 +83,12 @@ Describe "Password" {
             $NewPasswordTitle = $PasswordTitle + "2"
             $PasswordUpdated = Set-PasswordstatePassword -PasswordID $Password.PasswordID -Title $NewPasswordTitle
             $PasswordUpdated.Title | should -Be $NewPasswordTitle
-        }    
+            Set-PasswordstatePassword -PasswordID $Password.PasswordID -Title $PasswordTitle
+        }
+
+        It "Find" {
+            $Password = Find-PasswordstatePassword -Search $Password.Title
+            $Password.Title | should -Be $PasswordTitle
+        }
     }
 }
