@@ -1,8 +1,8 @@
 Import-Module -Force PasswordstatePowerShell
-Set-PasswordstateAPIType -APIType 'Windows Integrated'
+
 Describe "Get-PasswordStateAPITypePath" {
     It "Default" {
-        Get-PasswordStateAPITypePath | Should -Be "api"
+        Get-PasswordStateAPITypePath | Should -Be "winapi"
     }
 
     It "Standard" {
@@ -41,12 +41,14 @@ Describe "List" {
     }
 
     It "Get by ID" {
-        Get-PasswordstateList -ID 166 | Should -Not -BeNullOrEmpty
+        $PasswordList = Get-PasswordstateList -ID 166 
+        $PasswordList.PasswordListID | Should -Be 166
     }
 
     It "Get all" {
         Get-PasswordstateList -All | Should -Not -BeNullOrEmpty
     }
+
     It "Find by Name" {
         Find-PasswordstateList -PasswordList $TestPasswordListName | Should -Not -BeNullOrEmpty
     }
@@ -78,6 +80,4 @@ Describe "Password" {
         $PasswordUpdated = Set-PasswordstatePassword -PasswordID $Password.PasswordID -Title $NewPasswordTitle
         $PasswordUpdated.Title | should -Be $NewPasswordTitle
     }
-
-    It ""
 }

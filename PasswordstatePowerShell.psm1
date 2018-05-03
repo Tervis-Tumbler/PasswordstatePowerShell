@@ -182,7 +182,7 @@ function Get-PasswordstatePassword {
     if ($AsCredential) {
         $CredentialPassword = ConvertTo-SecureString $Password.Password -AsPlainText -Force
         New-Object System.Management.Automation.PSCredential ($Password.UserName, $CredentialPassword)
-    else {
+    } else {
         $Password
     }
 }
