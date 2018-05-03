@@ -17,7 +17,7 @@ function Get-PasswordstateAPIType {
     if ($Script:PasswordstateAPIType) {
         $Script:PasswordstateAPIType
     } else {
-        "Standard"
+        "Windows Integrated"
     }
 }
 
