@@ -448,12 +448,3 @@ function Get-PasswordstateRandomPassword {
     )
     Invoke-PasswordstateAPI -Method get -Resource generatepassword -QueryStringParameters ($PSBoundParameters | ConvertFrom-PSBoundParameters -AsHashTable)
 }
-
-function Chris {
-    Import-Module -Force PasswordstatePowerShell
-    Set-PasswordstateAPIType -APIType 'Windows Integrated'
-    Invoke-PasswordstateAPI -Resource passwordlists -ResourceID 66 -Method Get
-    Get-PasswordstateList -PasswordList "Disco Weblogic"
-    Get-PasswordstatePassword -ID 4046
-    Get-PasswordstateRandomPassword
-}
