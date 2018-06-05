@@ -76,7 +76,17 @@ function Invoke-PasswordstateAPI {
     $PasswordstateAPIType = Get-PasswordstateAPIType
 
     $InFileParameter = $PSBoundParameters | ConvertFrom-PSBoundParameters -Property InFile -AsHashTable
-    $Body = $BodyParameters | ConvertTo-Json
+    if ($BodyParameters) {
+        $Keys = @()
+        $Keys += $BodyParameters.Keys
+        $Keys | ForEach-Object {
+            if ($BodyParameters[$_].IsPresent) {
+                $BodyParameters[$_] = $true
+            }
+        }
+        $Body = $BodyParameters | ConvertTo-Json
+    }
+
     $BodyParameterSet = if($Body) {
         @{
             Body = $Body
