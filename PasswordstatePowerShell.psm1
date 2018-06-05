@@ -349,10 +349,19 @@ function Find-PasswordstatePassword {
         [Parameter(ParameterSetName="SpecificSearch")]$PasswordResetEnabled,
         [Parameter(ParameterSetName="SpecificSearch")]$ExpiryDate,
         [Parameter(ParameterSetName="SpecificSearch")]$ExpiryDateRange,
-        [Parameter(ParameterSetName="SpecificSearch")]$AndOr
+        [Parameter(ParameterSetName="SpecificSearch")]$AndOr,
+        [Switch]$AsCredential
     )
     $ResourceIDParameter = if ($PasswordListID) {@{ResourceID = $PasswordListID}} else {@{}}
-    Invoke-PasswordstateAPI -Method get -Resource searchpasswords @ResourceIDParameter -QueryStringParameters $PSBoundParameters
+    $PSBoundParameters.remove("AsCredential") | Out-Null
+    $Password = Invoke-PasswordstateAPI -Method get -Resource searchpasswords @ResourceIDParameter -QueryStringParameters $PSBoundParameters
+
+    if ($AsCredential -and $Password) {
+        $CredentialPassword = ConvertTo-SecureString $Password.Password -AsPlainText -Force
+        New-Object System.Management.Automation.PSCredential ($Password.UserName, $CredentialPassword)
+    } elseif ($Password) {
+        $Password
+    }
 }
 
 function New-PasswordstateDependency {
