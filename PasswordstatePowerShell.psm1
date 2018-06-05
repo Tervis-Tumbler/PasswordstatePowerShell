@@ -448,3 +448,12 @@ function Get-PasswordstateRandomPassword {
     )
     Invoke-PasswordstateAPI -Method get -Resource generatepassword -QueryStringParameters ($PSBoundParameters | ConvertFrom-PSBoundParameters -AsHashTable)
 }
+
+function ConvertFrom-SecureString {
+    param (
+        [Parameter(Mandatory,ValueFromPipeline)]
+        [System.Security.SecureString]$SecureString
+    )
+    $BSTR = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($SecureString)
+    [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)
+}
