@@ -90,7 +90,17 @@ function Invoke-PasswordstateAPI {
     $PasswordstateAPIType = Get-PasswordstateAPIType
     
     $InFileParameter = $PSBoundParameters | ConvertFrom-PSBoundParameters -Property InFile -AsHashTable
-    $Body = $BodyParameters | ConvertTo-Json
+    if ($BodyParameters) {
+        $Keys = @()
+        $Keys += $BodyParameters.Keys
+        $Keys | ForEach-Object {
+            if ($BodyParameters[$_].IsPresent) {
+                $BodyParameters[$_] = $true
+            }
+        }
+        $Body = $BodyParameters | ConvertTo-Json
+    }
+
     $BodyParameterSet = if($Body) {
         @{
             Body = $Body
@@ -354,10 +364,19 @@ function Find-PasswordstatePassword {
         [Parameter(ParameterSetName="SpecificSearch")]$PasswordResetEnabled,
         [Parameter(ParameterSetName="SpecificSearch")]$ExpiryDate,
         [Parameter(ParameterSetName="SpecificSearch")]$ExpiryDateRange,
-        [Parameter(ParameterSetName="SpecificSearch")]$AndOr
+        [Parameter(ParameterSetName="SpecificSearch")]$AndOr,
+        [Switch]$AsCredential
     )
     $ResourceIDParameter = if ($PasswordListID) {@{ResourceID = $PasswordListID}} else {@{}}
-    Invoke-PasswordstateAPI -Method get -Resource searchpasswords @ResourceIDParameter -QueryStringParameters $PSBoundParameters
+    $PSBoundParameters.remove("AsCredential") | Out-Null
+    $Password = Invoke-PasswordstateAPI -Method get -Resource searchpasswords @ResourceIDParameter -QueryStringParameters $PSBoundParameters
+
+    if ($AsCredential -and $Password) {
+        $CredentialPassword = ConvertTo-SecureString $Password.Password -AsPlainText -Force
+        New-Object System.Management.Automation.PSCredential ($Password.UserName, $CredentialPassword)
+    } elseif ($Password) {
+        $Password
+    }
 }
 
 function New-PasswordstateDependency {
@@ -462,4 +481,13 @@ function Get-PasswordstateRandomPassword {
         [int]$Qty
     )
     Invoke-PasswordstateAPI -Method get -Resource generatepassword -QueryStringParameters ($PSBoundParameters | ConvertFrom-PSBoundParameters -AsHashTable)
+}
+
+function ConvertFrom-SecureString {
+    param (
+        [Parameter(Mandatory,ValueFromPipeline)]
+        [System.Security.SecureString]$SecureString
+    )
+    $BSTR = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($SecureString)
+    [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)
 }
