@@ -37,6 +37,21 @@ function Get-PasswordstateAPITypePath {
     }
 }
 
+function Set-PasswordstateAPIKey {
+    param (
+        $APIKey
+    )
+    $Script:APIKey = $APIKey
+}
+
+function Get-PasswordstateAPIKey {
+    if ($Script:APIKey) {
+        $Script:APIKey
+    } else {
+        throw "Get-PasswordstateAPIKey called but Passwordstate APIKey not set"
+    }
+}
+
 function Get-PasswordstateAPIURL {
     [CmdletBinding()]
     param (
@@ -66,7 +81,6 @@ function Invoke-PasswordstateAPI {
         $ResourceID,
         $SubResource,
         $Method,
-        $APIKey,
         $QueryStringParameters,
         $BodyParameters,
         $InFile
@@ -74,7 +88,7 @@ function Invoke-PasswordstateAPI {
     $GetPasswordstateAPIURLParameters = $PSBoundParameters | ConvertFrom-PSBoundParameters -Property Resource,ResourceID,SubResource,QueryStringParameters -AsHashTable
     $PasswordstateAPIURL = Get-PasswordstateAPIURL @GetPasswordstateAPIURLParameters
     $PasswordstateAPIType = Get-PasswordstateAPIType
-
+    
     $InFileParameter = $PSBoundParameters | ConvertFrom-PSBoundParameters -Property InFile -AsHashTable
     $Body = $BodyParameters | ConvertTo-Json
     $BodyParameterSet = if($Body) {
@@ -86,7 +100,8 @@ function Invoke-PasswordstateAPI {
         @{}
     }
     
-    if ($PasswordstateAPIType -eq "Standard") {            
+    if ($PasswordstateAPIType -eq "Standard") {
+        $APIKey = Get-PasswordstateAPIKey
         Invoke-Restmethod -Method $Method -Uri $PasswordstateAPIURL -Header @{ "APIKey" = $APIKey } @InFileParameter @BodyParameterSet
     } elseif ($PasswordstateAPIType -eq "Windows Integrated") {
         Invoke-Restmethod -Method $Method -Uri $PasswordstateAPIURL -UseDefaultCredentials @InFileParameter @BodyParameterSet
