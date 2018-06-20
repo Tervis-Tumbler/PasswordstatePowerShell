@@ -47,6 +47,9 @@ function Set-PasswordstateAPIKey {
 function Get-PasswordstateAPIKey {
     if ($Script:APIKey) {
         $Script:APIKey
+    } elseif ($env:PasswordStateAPIKey) {
+        Set-PasswordstateAPIKey -APIKey $env:PasswordStateAPIKey
+        $env:PasswordStateAPIKey
     } else {
         throw "Get-PasswordstateAPIKey called but Passwordstate APIKey not set"
     }
