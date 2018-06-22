@@ -1,16 +1,18 @@
-function Get-PasswordstateAPIRootURL {
-    if ($Script:PasswordstateAPIRootURL) {
-        $Script:PasswordstateAPIRootURL
+function Get-PasswordstateComputerName {
+    if ($Script:PasswordstateComputerName) {
+        $Script:PasswordstateComputerName
     } else {
         "Passwordstate"
     }
 }
 
-function Set-PasswordstateAPIRootURL {
+function Set-PasswordstateComputerName {
     param (
-        $PasswordstateAPIRootURL
+        [Parameter(Mandatory,ValueFromPipelineByPropertyName)]$ComputerName
     )
-    $Script:PasswordstateAPIRootURL = $PasswordstateAPIRootURL
+    process {
+        $Script:PasswordstateComputerName = $ComputerName
+    }    
 }
 
 function Get-PasswordstateAPIType {
@@ -65,11 +67,11 @@ function Get-PasswordstateAPIURL {
         $QueryStringParameters,
         $APIPath = (Get-PasswordstateAPITypePath)
     )
-    $PasswordstateAPIRootURL = Get-PasswordstateAPIRootURL    
+    $PasswordstateComputerName = Get-PasswordstateComputerName    
     $QueryString = if ($QueryStringParameters) {
         "?" + ($QueryStringParameters | ConvertTo-URLEncodedQueryStringParameterString)
     }
-    $URL = "https://$PasswordstateAPIRootURL/$APIPath/$Resource/$(if($SubResource){"$SubResource/"})$ResourceID$($QueryString)"
+    $URL = "https://$PasswordstateComputerName/$APIPath/$Resource/$(if($SubResource){"$SubResource/"})$ResourceID$($QueryString)"
     
     Write-Verbose $URL
     $URL
