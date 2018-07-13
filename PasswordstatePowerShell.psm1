@@ -379,8 +379,7 @@ function Find-PasswordstatePassword {
     $Password = Invoke-PasswordstateAPI -Method get -Resource searchpasswords @ResourceIDParameter -QueryStringParameters $PSBoundParameters
 
     if ($AsCredential -and $Password) {
-        $CredentialPassword = ConvertTo-SecureString $Password.Password -AsPlainText -Force
-        New-Object System.Management.Automation.PSCredential ($Password.UserName, $CredentialPassword)
+        $Password | New-Crednetial
     } elseif ($Password) {
         $Password
     }
