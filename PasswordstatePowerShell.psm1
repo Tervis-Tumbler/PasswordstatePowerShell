@@ -80,7 +80,7 @@ function Get-PasswordstateAPIURL {
 function Invoke-PasswordstateAPI {
     [CmdletBinding()]
     param (
-        [ValidateSet("passwordlists","searchpasswordlists","folders","passwords","searchpasswords","generatepassword")]
+        [ValidateSet("passwordlists","searchpasswordlists","folders","passwords","searchpasswords","generatepassword","document")]
         $Resource,
 
         $ResourceID,
@@ -88,13 +88,15 @@ function Invoke-PasswordstateAPI {
         $Method,
         $QueryStringParameters,
         $BodyParameters,
-        $InFile
+        $InFile,
+        $OutFile
     )
     $GetPasswordstateAPIURLParameters = $PSBoundParameters | ConvertFrom-PSBoundParameters -Property Resource,ResourceID,SubResource,QueryStringParameters -AsHashTable
     $PasswordstateAPIURL = Get-PasswordstateAPIURL @GetPasswordstateAPIURLParameters
     $PasswordstateAPIType = Get-PasswordstateAPIType
     
     $InFileParameter = $PSBoundParameters | ConvertFrom-PSBoundParameters -Property InFile -AsHashTable
+    $OutFileParameter = $PSBoundParameters | ConvertFrom-PSBoundParameters -Property OutFile -AsHashTable
     if ($BodyParameters) {
         $Keys = @()
         $Keys += $BodyParameters.Keys
@@ -117,9 +119,9 @@ function Invoke-PasswordstateAPI {
     
     if ($PasswordstateAPIType -eq "Standard") {
         $APIKey = Get-PasswordstateAPIKey
-        Invoke-Restmethod -Method $Method -Uri $PasswordstateAPIURL -Header @{ "APIKey" = $APIKey } @InFileParameter @BodyParameterSet
+        Invoke-Restmethod -Method $Method -Uri $PasswordstateAPIURL -Header @{ "APIKey" = $APIKey } @InFileParameter @OutFileParameter @BodyParameterSet
     } elseif ($PasswordstateAPIType -eq "Windows Integrated") {
-        Invoke-Restmethod -Method $Method -Uri $PasswordstateAPIURL -UseDefaultCredentials @InFileParameter @BodyParameterSet
+        Invoke-Restmethod -Method $Method -Uri $PasswordstateAPIURL -UseDefaultCredentials @InFileParameter @OutFileParameter @BodyParameterSet
     }
 }
 
@@ -455,10 +457,12 @@ function New-PasswordstateDocument {
 
 function Get-PasswordstateDocument {
     param (
-        [ValidateSet("password","passwordlist","folder")]$DocumentLocation,
-        $DocumentID
-    )
-    Invoke-PasswordstateAPI -Method get -Resource document -SubResource $DocumentLocation -ResourceID $DocumentID
+        [ValidateSet("password","passwordlist","folder")][Parameter(Mandatory)]$DocumentLocation,
+        [Parameter(Mandatory)]$DocumentID,
+        $OutFile
+    ) 
+    $OutFileParameter = $PSBoundParameters | ConvertFrom-PSBoundParameters -Property OutFile -AsHashTable
+    Invoke-PasswordstateAPI -Method get -Resource document -SubResource $DocumentLocation -ResourceID $DocumentID @OutFileParameter
 }
 
 function Get-PasswordstateRandomPassword {
