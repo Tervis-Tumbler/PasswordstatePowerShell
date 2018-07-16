@@ -376,6 +376,7 @@ function Find-PasswordstatePassword {
     )
     $ResourceIDParameter = if ($PasswordListID) {@{ResourceID = $PasswordListID}} else {@{}}
     $PSBoundParameters.remove("AsCredential") | Out-Null
+    $PSBoundParameters.remove("PasswordListID") | Out-Null
     $Password = Invoke-PasswordstateAPI -Method get -Resource searchpasswords @ResourceIDParameter -QueryStringParameters $PSBoundParameters
 
     if ($AsCredential -and $Password) {
