@@ -2,7 +2,7 @@ function Get-PasswordstateComputerName {
     if ($Script:PasswordstateComputerName) {
         $Script:PasswordstateComputerName
     } else {
-        "Passwordstate"
+        "Passwordstate.tervis.com"
     }
 }
 
